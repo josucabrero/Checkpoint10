@@ -49,41 +49,56 @@ function getRandomComment() {
     return comments[Math.floor(Math.random() * comments.length)];
 }
 
-
 function selectItem(items, itemType) {
-    let selected = prompt(`Please select a ${itemType}: ${Object.keys(items).join(", ")}`);
+    let selected = prompt(`Please select a ${itemType}:\n${Object.keys(items).map(item => `${item} - $${items[item].toFixed(2)}`).join("\n")}`).toLowerCase();
     if (!items[selected]) {
         alert("Item not found, please try again.");
         return selectItem(items, itemType);
     }
     alert(`You selected ${selected}. ${getRandomComment()}`);
-    alert(`Price: $${items[selected].toFixed(2)}`);
-    return items[selected];
+    return selected;
 }
 
-function calculateTotal(entreePrice, side1Price, side2Price) {
+function calculateTotal(entreePrice, side1Price, side2Price, entreeName, side1Name, side2Name) {
     const total = entreePrice + side1Price + side2Price;
-    alert(`Total cost of your meal: $${total.toFixed(2)}`);
+
+    let bill = `=== Your Bill ===\n`;
+    bill += `${entreeName}: $${entreePrice.toFixed(2)}\n`;
+    bill += `${side1Name}: $${side1Price.toFixed(2)}\n`;
+    bill += `${side2Name}: $${side2Price.toFixed(2)}\n`;
+    bill += `============\n`;
+    bill += `Total: $${total.toFixed(2)}`;
+
+    alert(bill);
 }
 
 function runBottega() {
     alert("Welcome to Bottega Restaurant");
-    const mealType = prompt("Would you like Breakfast, Lunch, or Dinner?").toLowerCase();
-    const menu = bottegaMenu[mealType];
+    const hour = parseInt(prompt("Please enter the current hour (in 24-hour format):"));
+    let mealType;
 
-    if (!menu) {
-        console.log("Invalid meal type, please try again.");
-        return runBottega();
+    if (hour >= 6 && hour < 11) {
+        mealType = "breakfast";
+    } else if (hour >= 11 && hour < 16) {
+        mealType = "lunch";
+    } else if (hour >= 16 && hour < 22) {
+        mealType = "dinner";
+    } else {
+        alert("Sorry, the restaurant is closed at this hour.");
+        return;
     }
 
-    let entreePrice = selectItem(menu.entrees, "entree");
+    const menu = bottegaMenu[mealType];
 
-    let side1Price = selectItem(menu.sides, "side");
-    
-    let side2Price = selectItem(menu.sides, "side");
-    
+    let entreeName = selectItem(menu.entrees, "entree");
+    let side1Name = selectItem(menu.sides, "side");
+    let side2Name = selectItem(menu.sides, "side");
 
-    calculateTotal(entreePrice, side1Price, side2Price);
+    let entreePrice = menu.entrees[entreeName];
+    let side1Price = menu.sides[side1Name];
+    let side2Price = menu.sides[side2Name];
+
+    calculateTotal(entreePrice, side1Price, side2Price, entreeName, side1Name, side2Name);
 }
 
 runBottega();
